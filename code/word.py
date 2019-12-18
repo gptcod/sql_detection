@@ -13,10 +13,8 @@ datadir=".\data"
 
 normal_data="data/train_normal.txt"
 sql_data="data/train_sql.txt"
-xss_data="data/train_xss.txt"
 valid_normal="data/validation_normal.txt"
 valid_sql="data/validation_sql.txt"
-valid_xss="data/validation_xss.txt"
 model_dir="file/word2model"
 files="file"
 num_iter=10
@@ -56,38 +54,33 @@ def save_data(text,filename):
     with open(filename,'a') as f:
         for line in text:
             f.write(str(line.tolist())+"|"+str(text.classes)+"\n")
-def save_len(normal,sql,xss):
+def save_len(normal,sql):
     with open("./file/len",'w') as f:
-            f.write(str(normal.f_len+sql.f_len+xss.f_len))
+            f.write(str(normal.f_len+sql.f_len))
             
-def maxlen(normal,sql,xss):
+def maxlen(normal,sqls):
     max=0
     if normal.max_len<sql.max_len:
         max=sql.max_len
     else:
         max=normal.max_len
-    if max<xss.max_len:
-        max=xss.max_len
     return max
+
 def predata():
     startime=time.time()
     model=Word2Vec.load(model_dir)
     x_normal=getVecs(normal_data,model,0)
     x_sql=getVecs(sql_data,model,1)
-    x_xss=getVecs(xss_data,model,2)
     save_data(x_normal,"./file/x_train")
     save_data(x_sql,"./file/x_train")
-    save_data(x_xss,"./file/x_train")
-    save_len(x_normal,x_sql,x_xss)
     with open("./file/INPUT_SHAPE","w") as f:
-        f.write(str(max_features*maxlen(x_normal,x_sql,x_xss)))
+        f.write(str(max_features*maxlen(x_normal,x_sql)))
     print("save complete!")
 def valid_data():
     startime=time.time()
     model=Word2Vec.load(model_dir)
     x_normal=getVecs(valid_normal,model,0)
     x_sql=getVecs(valid_sql,model,1)
-    x_xss=getVecs(valid_xss,model,2)
     save_data(x_normal,"./file/x_valid")
     save_data(x_sql,"./file/x_valid")
     save_data(x_xss,"./file/x_valid")
@@ -149,7 +142,7 @@ def data_generator(batch_size,input_shape,filename):
                 X=keras.preprocessing.sequence.pad_sequences(X,
                     maxlen=input_shape, dtype='float32')
                 
-                Y=np_utils.to_categorical(Y,3)
+                Y=np_utils.to_categorical(Y,2)
 
                 yield (X,Y)
                 X=[]

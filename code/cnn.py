@@ -83,7 +83,7 @@ def train_mlp():
 		print(valid_lens)
 	valid_size=ceil(valid_lens//(BATCH_SIZE*NB_EPOCH))
 	print(valid_size)
-	model = MLP.build(input_shape=INPUT_SHAPE, classes=3)
+	model = MLP.build(input_shape=INPUT_SHAPE, classes=2)
 	print('1')
 	model.compile(loss="categorical_crossentropy", optimizer=OPTIMIZER,
 		metrics=["accuracy"])
